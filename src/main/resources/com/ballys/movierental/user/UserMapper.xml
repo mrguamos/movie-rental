@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE mapper PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN'
+        'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>
+
+<mapper namespace="com.ballys.movierental.user.UserMapper">
+
+    <select id="selectAll" resultType="com.ballys.movierental.user.User">
+        SELECT * FROM user
+    </select>
+
+    <insert id="insert">
+        INSERT INTO user (name, email)
+        VALUES (#{entity.name}, #{entity.email})
+    </insert>
+
+</mapper>

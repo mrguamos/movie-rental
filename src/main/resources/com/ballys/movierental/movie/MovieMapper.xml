@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE mapper PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN'
+        'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>
+
+<mapper namespace="com.ballys.movierental.movie.MovieMapper">
+
+    <resultMap id="MovieResultMap" type="com.ballys.movierental.movie.Movie" autoMapping="true">
+        <id property="id" column="id"/>
+        <collection columnPrefix="g_" autoMapping="true" javaType="Collection" property="genre" ofType="com.ballys.movierental.genre.Genre"/>
+    </resultMap>
+
+    <select id="selectByCriteria" resultMap="MovieResultMap">
+        WITH movies AS (
+            SELECT
+                m.id                            AS id,
+                m.title                         AS title,
+                m.year                          AS year,
+                m.price                         AS price,
+                m.quantity                      AS quantity
+            FROM movie m
+            INNER JOIN movie_genre mg ON mg.movie_id = m.id
+            INNER JOIN genre g ON g.id = mg.genre_id
+            <where>
+                <if test="@org.apache.commons.lang3.StringUtils@isNotEmpty(criteria.title)">
+                    lower(m.title) LIKE '%' || lower(#{criteria.title}) || '%'
+                </if>
+                <if test="criteria.year != null and @Integer@toString(criteria.year).length() == 4">
+                    AND m.year = #{criteria.year}
+                </if>
+                <if test="@org.apache.commons.lang3.StringUtils@isNotEmpty(criteria.genre)">
+                    AND lower(g.name) LIKE '%' || lower(#{criteria.genre}) || '%'
+                </if>
+            </where>
+            GROUP BY m.id
+            ORDER BY m.title ASC
+            LIMIT 20 OFFSET ((COALESCE(#{criteria.page}, 1) - 1) * 10)
+        )
+        SELECT
+            m.*,
+            mg.genre_id             AS g_id,
+            g.name                  AS g_name
+        FROM
+        movies m
+        INNER JOIN movie_genre mg ON mg.movie_id = m.id
+        INNER JOIN genre g ON g.id = mg.genre_id
+    </select>
+
+    <update id="updateQuantity">
+        UPDATE movie
+        SET quantity = #{quantity}
+        WHERE id = #{id}
+    </update>
+
+    <select id="selectQuantity" resultType="int">
+        SELECT quantity FROM movie WHERE id = #{id}
+    </select>
+
+    <update id="exclusiveLock">
+        BEGIN EXCLUSIVE;
+    </update>
+
+    <update id="commitTransaction">
+        COMMIT;
+    </update>
+
+    <update id="rollbackTransaction">
+        ROLLBACK;
+    </update>
+
+</mapper>
