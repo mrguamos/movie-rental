@@ -4,3 +4,5 @@
 `docker run -p 8080:80 app`
 
 Navigate to [Swagger API Documentation](http://localhost:8080/api/swagger-ui/index.html)
+# Live URL
+https://movie-rental-yzbhe.ondigitalocean.app/api/swagger-ui/index.html
