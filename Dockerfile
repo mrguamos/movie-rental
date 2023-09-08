@@ -7,4 +7,4 @@ RUN mvn clean install -Dmaven.test.skip=true
 FROM eclipse-temurin:17-alpine
 WORKDIR /app
 COPY --from=stage1 /app/target/app.jar /app
-ENTRYPOINT ["java","-jar","/app/app.jar", "--server.port=80"]
+ENTRYPOINT ["java","-jar","/app/app.jar"]
